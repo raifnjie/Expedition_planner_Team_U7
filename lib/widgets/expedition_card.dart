@@ -27,6 +27,8 @@ class ExpeditionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final riskColor = _riskColor(riskLevel);
+
     return Card(
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
@@ -64,13 +66,13 @@ class ExpeditionCard extends StatelessWidget {
                         vertical: 5,
                       ),
                       decoration: BoxDecoration(
-                        color: _riskColor(riskLevel).withValues(alpha: 0.15),
+                        color: riskColor.withAlpha(35),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
                         '$riskLevel Risk',
                         style: TextStyle(
-                          color: _riskColor(riskLevel),
+                          color: riskColor,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
