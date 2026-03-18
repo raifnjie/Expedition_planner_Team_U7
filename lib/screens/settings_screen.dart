@@ -1,3 +1,7 @@
+// This screen allows users to customize app settings such as theme, 
+// measurement units, and AI suggestions. Settings are updated dynamically 
+// in the UI using switches and dropdowns.
+
 import 'package:flutter/material.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -8,9 +12,10 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  //this can track whether or not dark mode is enabled
   bool darkMode = false;
-  bool aiSuggestions = true;
-  String selectedUnit = 'Miles / lbs';
+  bool aiSuggestions = true; //If AI suggestions are enabled
+  String selectedUnit = 'Miles / lbs'; //tracks users selected measurement unit
 
   @override
   Widget build(BuildContext context) {

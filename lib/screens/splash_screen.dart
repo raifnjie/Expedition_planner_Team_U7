@@ -1,3 +1,7 @@
+// This screen is the splash/loading screen displayed when the app starts.
+// It shows an app logo, title, subtitle, and a loading indicator, then
+// automatically navigates to the dashboard after a short delay.
+
 import 'dart:async';
 import 'package:flutter/material.dart';
 
@@ -13,8 +17,9 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
 
+  // Timer to navigate to dashboard after 2 seconds
     Timer(const Duration(seconds: 2), () {
-      if (!mounted) return;
+      if (!mounted) return; //Ensure that widget is still in the tree
       Navigator.pushReplacementNamed(context, '/dashboard');
     });
   }

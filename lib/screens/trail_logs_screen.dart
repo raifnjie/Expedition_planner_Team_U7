@@ -1,3 +1,6 @@
+// This screen allows users to view and manage trail logs for an expedition.
+// Each log entry includes notes, observations, or reminders. Users can
+// view existing logs and (eventually) add new entries.
 import 'package:flutter/material.dart';
 
 class TrailLogsScreen extends StatelessWidget {
@@ -5,6 +8,7 @@ class TrailLogsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+  //samble trail log entries 
     final logs = [
       'Reached camp before sunset. Weather stayed clear.',
       'Steep incline after checkpoint 2. Trail became muddy.',

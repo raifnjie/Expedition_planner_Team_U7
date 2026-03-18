@@ -1,3 +1,7 @@
+//This file is all of the themes and colors for the app. It defines a light theme with a primary green color, 
+//light green accents, and an orange accent color. The theme also includes styles for the app bar, cards, buttons, 
+//and input fields to create a cohesive and visually appealing design throughout the app.
+
 import 'package:flutter/material.dart';
 
 class AppTheme {

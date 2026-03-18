@@ -1,8 +1,13 @@
+//This screen serves as the main dashboard for the our expidition planner.
+//It loads the expidition data from a local database, displays a loist of trips,
+//and allows users to create, edit, and view expiditions that they ahve created. 
+
 import 'package:flutter/material.dart';
 import '../models/expedition.dart';
 import '../services/database_helper.dart';
 import '../widgets/expedition_card.dart';
 
+// Here we use a Stateful widget since the data (expeditions) changes dynamically
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
 
@@ -11,13 +16,15 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+    // List to store all expeditions retrieved from the database
   List<Expedition> expeditions = [];
+    // We added a Loading state to show spinner while fetching data to display to ensure a smooth user experience
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    loadExpeditions();
+    loadExpeditions(); //load the data once the screen is initialized 
   }
 
   Future<void> loadExpeditions() async {
@@ -25,8 +32,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
       isLoading = true;
     });
 
+    // Retrieve expedition data from database helper
     final data = await DatabaseHelper.instance.getAllExpeditions();
-
+//Prevent updating UI if the widget is no longer mounted
     if (!mounted) return;
 
     setState(() {
@@ -35,16 +43,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
   }
 
+  // Navigate to form screen (for creating or editing an expedition)
   Future<void> openFormScreen({Expedition? expedition}) async {
     await Navigator.pushNamed(
       context,
       '/expedition-form',
-      arguments: expedition,
+      arguments: expedition, // Pass existing expedition if editing
     );
 
-    loadExpeditions();
+    loadExpeditions(); // Reload list after returning
   }
 
+// Navigate to details screen for a specific expedition
   Future<void> openDetailsScreen(Expedition expedition) async {
     await Navigator.pushNamed(
       context,
@@ -52,7 +62,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       arguments: expedition,
     );
 
-    loadExpeditions();
+    loadExpeditions(); // Refresh in case data was updated
   }
 
   @override
@@ -67,6 +77,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ],
       ),
+            // Pull-to-refresh wrapper
       body: RefreshIndicator(
         onRefresh: loadExpeditions,
         child: Padding(
@@ -87,6 +98,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 style: TextStyle(color: Colors.grey.shade700),
               ),
               const SizedBox(height: 16),
+
+              //Main content area
               Expanded(
                 child: isLoading
                     ? const Center(child: CircularProgressIndicator())
