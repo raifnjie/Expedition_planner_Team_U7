@@ -1,8 +1,14 @@
+//This screen displays a simple analytics dashboard for the app, showing key metrics and 
+//information about about the expidition like total distance, gear weight, expenses, etc. 
+
 import 'package:flutter/material.dart';
 
+//StatelessWidget since the analytics data is static
 class AnalyticsScreen extends StatelessWidget {
   const AnalyticsScreen({super.key});
 
+
+//reusable widget method used to create a summary card with an icon, title, and value. This is used to display different analytics metrics in a consistent format.
   Widget summaryCard({
     required IconData icon,
     required String title,
@@ -48,6 +54,7 @@ class AnalyticsScreen extends StatelessWidget {
               title: 'Total Planned Expenses',
               value: '\$83',
             ),
+            //Displays the number of completed task
             summaryCard(
               icon: Icons.task_alt,
               title: 'Tasks Completed',
