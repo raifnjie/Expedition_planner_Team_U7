@@ -1,4 +1,4 @@
-# expeditiontravlerteamu7
+# Expedition Travler Team U7
 
 ## Project Summary
 
