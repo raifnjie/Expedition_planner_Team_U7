@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/expedition.dart';
 import '../services/database_helper.dart';
+import '../services/app_settings.dart';
 import '../widgets/expedition_card.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -46,6 +47,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> openDetailsScreen(Expedition expedition) async {
+    await AppSettings.instance.setLastOpenedExpedition(expedition);
+
     await Navigator.pushNamed(
       context,
       '/expedition-details',
@@ -57,78 +60,103 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Expedition Planner'),
-        actions: [
-          IconButton(
-            onPressed: () => Navigator.pushNamed(context, '/settings'),
-            icon: const Icon(Icons.settings),
-          ),
-        ],
-      ),
-      body: RefreshIndicator(
-        onRefresh: loadExpeditions,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Your Expeditions',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Create, view, edit, and manage your trips offline.',
-                style: TextStyle(color: Colors.grey.shade700),
-              ),
-              const SizedBox(height: 16),
-              Expanded(
-                child: isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : expeditions.isEmpty
-                        ? ListView(
-                            children: [
-                              const SizedBox(height: 120),
-                              Center(
-                                child: Text(
-                                  'No expeditions yet. Create your first trip.',
-                                  style: TextStyle(
-                                    color: Colors.grey.shade700,
-                                    fontSize: 16,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ],
-                          )
-                        : ListView.builder(
-                            itemCount: expeditions.length,
-                            itemBuilder: (context, index) {
-                              final expedition = expeditions[index];
-                              return ExpeditionCard(
-                                title: expedition.name,
-                                dates:
-                                    '${expedition.startDate} - ${expedition.endDate}',
-                                riskLevel: expedition.riskLevel,
-                                onTap: () => openDetailsScreen(expedition),
-                              );
-                            },
-                          ),
+    return AnimatedBuilder(
+      animation: AppSettings.instance,
+      builder: (context, _) {
+        final settings = AppSettings.instance;
+        final lastOpened = expeditions.cast<Expedition?>().firstWhere(
+              (e) => e?.id == settings.lastOpenedExpeditionId,
+              orElse: () => null,
+            );
+
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('Expedition Planner'),
+            actions: [
+              IconButton(
+                onPressed: () => Navigator.pushNamed(context, '/settings'),
+                icon: const Icon(Icons.settings),
               ),
             ],
           ),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => openFormScreen(),
-        icon: const Icon(Icons.add),
-        label: const Text('New Expedition'),
-      ),
+          body: RefreshIndicator(
+            onRefresh: loadExpeditions,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Your Expeditions',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Create, view, edit, and manage your trips offline.',
+                    style: TextStyle(color: Colors.grey.shade700),
+                  ),
+                  if (lastOpened != null) ...[
+                    const SizedBox(height: 16),
+                    Card(
+                      child: ListTile(
+                        leading: const Icon(Icons.history),
+                        title: const Text('Last Opened Expedition'),
+                        subtitle: Text(lastOpened.name),
+                        trailing: TextButton(
+                          onPressed: () => openDetailsScreen(lastOpened),
+                          child: const Text('Open'),
+                        ),
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: isLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : expeditions.isEmpty
+                            ? ListView(
+                                children: [
+                                  const SizedBox(height: 120),
+                                  Center(
+                                    child: Text(
+                                      'No expeditions yet. Create your first trip.',
+                                      style: TextStyle(
+                                        color: Colors.grey.shade700,
+                                        fontSize: 16,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : ListView.builder(
+                                itemCount: expeditions.length,
+                                itemBuilder: (context, index) {
+                                  final expedition = expeditions[index];
+                                  return ExpeditionCard(
+                                    title: expedition.name,
+                                    dates:
+                                        '${expedition.startDate} - ${expedition.endDate}',
+                                    riskLevel: expedition.riskLevel,
+                                    onTap: () => openDetailsScreen(expedition),
+                                  );
+                                },
+                              ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          floatingActionButton: FloatingActionButton.extended(
+            onPressed: () => openFormScreen(),
+            icon: const Icon(Icons.add),
+            label: const Text('New Expedition'),
+          ),
+        );
+      },
     );
   }
 }
