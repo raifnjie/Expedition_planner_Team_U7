@@ -106,9 +106,7 @@ class ExpeditionDetailsScreen extends StatelessWidget {
                     const SizedBox(height: 12),
                     const Text(
                       'Notes',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 6),
                     Text(
@@ -125,31 +123,51 @@ class ExpeditionDetailsScreen extends StatelessWidget {
               title: 'Route Manager',
               subtitle: 'Manage trip stages, distances, and notes',
               icon: Icons.alt_route,
-              onTap: () => Navigator.pushNamed(context, '/routes'),
+              onTap: () => Navigator.pushNamed(
+                context,
+                '/routes',
+                arguments: expedition,
+              ),
             ),
             ModuleButton(
               title: 'Gear Manager',
               subtitle: 'Track items, categories, and total weight',
               icon: Icons.backpack,
-              onTap: () => Navigator.pushNamed(context, '/gear'),
+              onTap: () => Navigator.pushNamed(
+                context,
+                '/gear',
+                arguments: expedition,
+              ),
             ),
             ModuleButton(
               title: 'Trail Logs',
               subtitle: 'Store observations and trip notes',
               icon: Icons.menu_book,
-              onTap: () => Navigator.pushNamed(context, '/logs'),
+              onTap: () => Navigator.pushNamed(
+                context,
+                '/logs',
+                arguments: expedition,
+              ),
             ),
             ModuleButton(
               title: 'Budget & Tasks',
               subtitle: 'Track expenses and completion status',
               icon: Icons.checklist,
-              onTap: () => Navigator.pushNamed(context, '/budget-tasks'),
+              onTap: () => Navigator.pushNamed(
+                context,
+                '/budget-tasks',
+                arguments: expedition,
+              ),
             ),
             ModuleButton(
               title: 'Analytics',
               subtitle: 'View expedition summary information',
               icon: Icons.analytics,
-              onTap: () => Navigator.pushNamed(context, '/analytics'),
+              onTap: () => Navigator.pushNamed(
+                context,
+                '/analytics',
+                arguments: expedition,
+              ),
             ),
           ],
         ),
