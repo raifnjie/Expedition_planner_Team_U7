@@ -28,6 +28,7 @@ class ExpeditionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final riskColor = _riskColor(riskLevel);
+    final scheme = Theme.of(context).colorScheme;
 
     return Card(
       child: InkWell(
@@ -39,8 +40,8 @@ class ExpeditionCard extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 26,
-                backgroundColor: Colors.green.shade100,
-                child: const Icon(Icons.terrain, color: Colors.green),
+                backgroundColor: scheme.primaryContainer,
+                child: Icon(Icons.terrain, color: scheme.primary),
               ),
               const SizedBox(width: 14),
               Expanded(

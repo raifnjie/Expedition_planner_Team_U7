@@ -16,6 +16,8 @@ class ModuleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
     return Card(
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(
@@ -23,8 +25,8 @@ class ModuleButton extends StatelessWidget {
           vertical: 10,
         ),
         leading: CircleAvatar(
-          backgroundColor: Colors.green.shade100,
-          child: Icon(icon, color: Colors.green.shade800),
+          backgroundColor: scheme.primaryContainer,
+          child: Icon(icon, color: scheme.primary),
         ),
         title: Text(
           title,

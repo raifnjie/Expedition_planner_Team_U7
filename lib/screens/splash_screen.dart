@@ -21,6 +21,8 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       body: Center(
         child: Padding(
@@ -30,11 +32,11 @@ class _SplashScreenState extends State<SplashScreen> {
             children: [
               CircleAvatar(
                 radius: 46,
-                backgroundColor: Colors.green.shade100,
+                backgroundColor: scheme.primaryContainer,
                 child: Icon(
                   Icons.explore,
                   size: 50,
-                  color: Colors.green.shade800,
+                  color: scheme.primary,
                 ),
               ),
               const SizedBox(height: 24),
