@@ -6,6 +6,7 @@ import '../models/gear_item.dart';
 import '../models/trail_log_item.dart';
 import '../models/expense_item.dart';
 import '../models/task_item.dart';
+import '../models/ai_feedback.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
@@ -26,9 +27,16 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _createDB,
+      onUpgrade: _upgradeDB,
     );
+  }
+
+  Future<void> _upgradeDB(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await _createAiFeedbackTable(db);
+    }
   }
 
   Future<void> _createDB(Database db, int version) async {
@@ -90,6 +98,21 @@ class DatabaseHelper {
         isCompleted INTEGER NOT NULL DEFAULT 0
       )
     ''');
+
+    await _createAiFeedbackTable(db);
+  }
+
+  Future<void> _createAiFeedbackTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS ai_feedback (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        expeditionId INTEGER NOT NULL,
+        suggestionKey TEXT NOT NULL,
+        suggestionText TEXT NOT NULL,
+        wasHelpful INTEGER NOT NULL,
+        createdAt TEXT NOT NULL
+      )
+    ''');
   }
 
   Future<int> createExpedition(Expedition expedition) async {
@@ -134,6 +157,7 @@ class DatabaseHelper {
     await db.delete('logs', where: 'expeditionId = ?', whereArgs: [id]);
     await db.delete('expenses', where: 'expeditionId = ?', whereArgs: [id]);
     await db.delete('tasks', where: 'expeditionId = ?', whereArgs: [id]);
+    await db.delete('ai_feedback', where: 'expeditionId = ?', whereArgs: [id]);
 
     return await db.delete(
       'expeditions',
@@ -331,6 +355,84 @@ class DatabaseHelper {
       'completed': completed,
       'total': tasks.length,
     };
+  }
+
+  Future<int> createAiFeedback(AIFeedback feedback) async {
+    final db = await instance.database;
+    return await db.insert('ai_feedback', feedback.toMap());
+  }
+
+  Future<int> getFeedbackDelta(String suggestionKey) async {
+    final db = await instance.database;
+    final result = await db.query(
+      'ai_feedback',
+      columns: ['wasHelpful'],
+      where: 'suggestionKey = ?',
+      whereArgs: [suggestionKey],
+    );
+
+    int helpful = 0;
+    int notHelpful = 0;
+
+    for (final row in result) {
+      if ((row['wasHelpful'] ?? 0) == 1) {
+        helpful++;
+      } else {
+        notHelpful++;
+      }
+    }
+
+    return helpful - notHelpful;
+  }
+
+  Future<double?> getAverageHistoricalGearWeight(int currentExpeditionId) async {
+    final db = await instance.database;
+    final expeditionRows = await db.query(
+      'expeditions',
+      columns: ['id'],
+      where: 'id != ?',
+      whereArgs: [currentExpeditionId],
+    );
+
+    final totals = <double>[];
+
+    for (final row in expeditionRows) {
+      final id = row['id'] as int;
+      final total = await getTotalGearWeight(id);
+      if (total > 0) {
+        totals.add(total);
+      }
+    }
+
+    if (totals.isEmpty) return null;
+
+    final sum = totals.reduce((a, b) => a + b);
+    return sum / totals.length;
+  }
+
+  Future<bool> hasRainHistory(int currentExpeditionId) async {
+    final logs = await getAllHistoricalLogsExcept(currentExpeditionId);
+    for (final log in logs) {
+      final text = log.note.toLowerCase();
+      if (text.contains('rain') ||
+          text.contains('storm') ||
+          text.contains('wet') ||
+          text.contains('mud')) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  Future<List<TrailLogItem>> getAllHistoricalLogsExcept(int currentExpeditionId) async {
+    final db = await instance.database;
+    final result = await db.query(
+      'logs',
+      where: 'expeditionId != ?',
+      whereArgs: [currentExpeditionId],
+      orderBy: 'id DESC',
+    );
+    return result.map((map) => TrailLogItem.fromMap(map)).toList();
   }
 
   Future<void> close() async {
