@@ -41,12 +41,8 @@ flutter build apk --release
 APK location: build/app/outputs/flutter-apk/app-release.apk
 
 # Simple User Guide
-1. Home Screen
-- Displays app logo and initializes the database.
-- Automatically transitions to Dashboard.
-
-2. Dashboard
-- View all expeditions in a list.
+1. Splash (Home) Screen
+- Displays recent or past expeditions and initializes the database.
 - Tap Create Expedition to start a new expedition.
 - Tap an existing expedition card to open Expedition Details.
 - Access Settings from the top-right icon.
